@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo/completed.dart';
 import 'package:todo/edit.dart';
+import 'package:todo/profile.dart';
 import './splash.dart';
 import './add_taskpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,13 +28,14 @@ class _ToDoState extends State<ToDo> {
 
   final db = Firestore.instance;
   static Todo todo;
-  List<Todo> list = [];
+  List<Todo> list;
 
   @override
   void initState() {
     asyncInit();
     super.initState();
   }
+             
 
   void showSnackBar(String value) {
     _scaffoldKey.currentState.showSnackBar(new SnackBar(
@@ -42,13 +44,11 @@ class _ToDoState extends State<ToDo> {
   }
 
   asyncInit() async {
-    
     await db
         .collection("info")
         .where("completed", isEqualTo: false)
         .getDocuments()
         .then((querySnapshot) {
-          
       var data = querySnapshot.documents;
       list = data
           .map((m) => Todo(
@@ -57,9 +57,10 @@ class _ToDoState extends State<ToDo> {
               title: m.data['title']))
           .toList();
       setState(() {});
-      //print(list.length);
     });
   }
+        
+
 
   addToList(Todo todo) {
     setState(() {
@@ -75,33 +76,43 @@ class _ToDoState extends State<ToDo> {
       appBar: AppBar(
         title: Text('TODO'),
         backgroundColor: Colors.purpleAccent,
-        elevation: 0.0, //for drop shadow...(gone).
+        elevation: 0.0,
       ),
       drawer: Drawer(
         child: ListView(
-          padding: EdgeInsets.zero,
           children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(color: Colors.pinkAccent),
-              child: Text(
-                'TODO',
-                style: TextStyle(
-                  color: Colors.grey[800],
-                  fontSize: 40,
-                ),
-              ),
-            ),
+           UserAccountsDrawerHeader(
+             accountName: Text(
+               "HEMANT PANERU"
+             ),
+             accountEmail: Text(
+               "hpaneru.hp@gmail.com"
+             ),
+             currentAccountPicture: CircleAvatar(
+              //backgroundColor: Colors.purpleAccent,
+              backgroundImage: AssetImage('image/img1.jpeg'),
+             ),
+           ),
             ListTile(
               title: Text('HOME'),
               onTap: () {
+                _handleRefresh();
                 Navigator.pop(context);
               },
+               
             ),
             ListTile(
               title: Text('COMPLETED TASK'),
               onTap: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => Completed()));
+              },
+            ),
+             ListTile(
+              title: Text('PROFILE'),
+              onTap: () {
+                Navigator.push(context,
+                 MaterialPageRoute(builder: (context) => Profile()));
               },
             ),
             ListTile(
@@ -129,10 +140,18 @@ class _ToDoState extends State<ToDo> {
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      body: new RefreshIndicator(
-        child: buildBody(),
-        onRefresh: _handleRefresh,
-      ),
+      body:list==null
+      ? Center(
+        child: CircularProgressIndicator(),
+      ):
+      list.length==0
+             ? Center(
+               child: Text("NO UNCOMPLETE TODOS"),
+             )
+          : new RefreshIndicator(
+              child: buildBody(),
+              onRefresh: _handleRefresh,
+            ),
     );
   }
 
@@ -144,6 +163,7 @@ class _ToDoState extends State<ToDo> {
       },
     );
   }
+
 
   editItem(Todo item, index, id) async {
     setState(() {
@@ -179,7 +199,7 @@ class _ToDoState extends State<ToDo> {
           title: GestureDetector(
               child: Text(item.title), onTap: () => showEditDialog(index)),
           trailing: Checkbox(
-                value:item.complete,
+              value: item.complete,
               onChanged: (status) {
                 setCompleteness(item, status);
               }),
@@ -209,7 +229,7 @@ class _ToDoState extends State<ToDo> {
   }
 
   Future<void> _handleRefresh() async {
-    Future.delayed(Duration(seconds: 10)).then((onValue) {
+    Future.delayed(Duration(seconds: 1)).then((onValue) {
       asyncInit();
     });
   }
