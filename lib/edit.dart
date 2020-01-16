@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo/button.dart';
-import 'package:todo/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:todo/todo.dart';
 
 
 class EditPage extends StatefulWidget {

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:todo/button.dart';
-import 'main.dart';
+import 'todo.dart';
 
 class AddTaskPage extends StatefulWidget {
   AddTaskPage(this.addToList);
