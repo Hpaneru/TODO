@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:todo/todo.dart';
 import 'services/usermanagement.dart';
@@ -9,16 +12,23 @@ class Signup extends StatefulWidget {
 }
  
 class _SignupState extends State<Signup> {
+  File _image;
   String _email;
   String _password;
-
   String name;
   String address;
   String phno;
  
+  Future getImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      _image = image;
+    });
+  }
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return Scaffold(
         body: SingleChildScrollView(
                   child: Center(
       child: Container(
@@ -31,6 +41,24 @@ class _SignupState extends State<Signup> {
                   fontSize: 30.0,
                   color: Colors.blueAccent[700],
                   fontWeight: FontWeight.bold),
+                    ), SizedBox(height: 15.0),
+                    GestureDetector(
+                      onTap: getImage,
+                      child: Container(
+                          width: 150.0,
+                          height: 150.0,
+                          decoration: BoxDecoration(
+                              color: Colors.red,
+                              image: DecorationImage(
+                                  image: _image != null
+                                      ? FileImage(_image)
+                                      : AssetImage('img/image.png'),
+                                  fit: BoxFit.cover),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(75.0)),
+                              boxShadow: [
+                                BoxShadow(blurRadius: 7.0, color: Colors.black)
+                              ])),
                     ),
                  SizedBox(height: 15.0),
                 TextField(
@@ -73,7 +101,7 @@ class _SignupState extends State<Signup> {
                         phno = value;
                       });
                     }),    
-                SizedBox(height: 20.0),
+                SizedBox(height: 15.0),
                 RaisedButton(
                   child: Text('Sign Up'),
                   color: Colors.blue,
@@ -82,9 +110,18 @@ class _SignupState extends State<Signup> {
                   onPressed: () {
                     FirebaseAuth.instance
                         .createUserWithEmailAndPassword(
-                            email: _email, password: _password,)
+                            email: _email, password: _password)
                         .then((signedInUser) {
-                      UserManagement().storeNewUser(signedInUser, context);
+                          User user=User()
+                            
+                          ..email=_email
+                          ..id=signedInUser.user.uid
+                          ..name=name
+                          ..address=address
+                          ..phone=phno;
+                          
+                          print(user.email);
+                      UserManagement().storeNewUser(user, context);
                         Navigator.pushReplacement(
                          context,
                          MaterialPageRoute(builder: (context)=> ToDo())
@@ -99,4 +136,13 @@ class _SignupState extends State<Signup> {
     ),
         ));
   }
+}
+class User{
+  String id;
+  String email;
+  String name;
+  String address;
+  String phone;
+
+  User({this.id, this.email, this.name, this.address, this.phone});
 }

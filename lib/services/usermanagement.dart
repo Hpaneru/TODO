@@ -1,13 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:todo/signup.dart';
 
 import 'package:flutter/widgets.dart';
 
 class UserManagement {
-  storeNewUser(AuthResult result, context) {
-    Firestore.instance.collection('/users').add({
-      'email': result.user.email,
-      'uid': result.user.uid
+  FirebaseUser firebaseUser;
+ 
+  storeNewUser(User result, context) async{
+   print("added");
+   var ref=Firestore.instance.collection('users');
+  await ref.document(result.id).setData({
+      'email': result.email,
+      'uid': result.id,
+      'name':result.name,
+      'address':result.address,
+      'phone':result.phone,
     }).then((value) {
       Navigator.of(context).pop();
       Navigator.of(context).pushReplacementNamed('/ToDO');
@@ -15,4 +23,5 @@ class UserManagement {
       print(e);
     });
   }
+  
 }

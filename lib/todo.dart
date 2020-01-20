@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:todo/completed.dart';
 import 'package:todo/edit.dart';
 import 'package:todo/login.dart';
+import 'package:todo/profile.dart';
 import './add_taskpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -80,7 +81,7 @@ class _ToDoState extends State<ToDo> {
              ),
              currentAccountPicture: CircleAvatar(
               //backgroundColor: Colors.purpleAccent,
-              backgroundImage: AssetImage('image/img1.jpeg'),
+              backgroundImage: AssetImage('img/image.png'),
              ),
            ),
             ListTile(
@@ -101,8 +102,8 @@ class _ToDoState extends State<ToDo> {
              ListTile(
               title: Text('PROFILE'),
               onTap: () {
-               // Navigator.push(context,
-                // MaterialPageRoute(builder: (context) => Profile()));
+               Navigator.push(context,
+                MaterialPageRoute(builder: (context) => Profile()));
               },
             ),
             ListTile(
