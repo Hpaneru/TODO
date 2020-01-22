@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,20 +13,20 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
 
+    FirebaseUser currentUser;
     void initState() {
-    asyncInit();
+  
     super.initState();
+
+    FirebaseAuth.instance.currentUser().then((user){
+      currentUser=user;
+    });
   }
 
-  asyncInit() async {
-    // final FirebaseUser user =await auth.currentUser();
-    // final uid=user.uid;
-  }
-
+  
 
   File _image;
-  // String _email;
-  // String _password;
+  
 
   String name;
   String address;
@@ -111,10 +113,11 @@ class _EditProfileState extends State<EditProfile> {
   }
 
  updateData() {
+
     try {
       Firestore.instance
           .collection('users')
-          .document('1GTCOphCMRSLHHVf0YhieNaTv9d2')
+          .document(currentUser.uid)
           .updateData({'name': name, 'address': address, 'phone': phno});
       print('updated');
       Navigator.pushReplacement(

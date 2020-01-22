@@ -16,15 +16,29 @@ class ToDo extends StatefulWidget {
 
 class _ToDoState extends State<ToDo> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  Map<String, dynamic> userInfo;
+  FirebaseUser currentUser;
 
   final db = Firestore.instance;
   static Todo todo;
   List<Todo> list;
-
+  
   @override
   void initState() {
     asyncInit();
     super.initState();
+     FirebaseAuth.instance.currentUser().then((user) {
+      currentUser = user;
+      Firestore.instance
+      .collection("users")
+      .document(currentUser.uid)
+      .get()
+      .then((snapshot){
+        setState((){
+          userInfo=snapshot.data;
+        });
+      });
+     });
   }
              
 
@@ -74,13 +88,12 @@ class _ToDoState extends State<ToDo> {
           children: <Widget>[
            UserAccountsDrawerHeader(
              accountName: Text(
-               "HEMANT PANERU"
+               userInfo["name"],
              ),
              accountEmail: Text(
-               "hpaneru.hp@gmail.com"
+               userInfo["email"],
              ),
              currentAccountPicture: CircleAvatar(
-              //backgroundColor: Colors.purpleAccent,
               backgroundImage: AssetImage('img/image.png'),
              ),
            ),
