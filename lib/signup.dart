@@ -1,10 +1,10 @@
 import 'dart:io';
-
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:todo/todo.dart';
 import 'services/usermanagement.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
  
 class Signup extends StatefulWidget {
   @override
@@ -13,11 +13,8 @@ class Signup extends StatefulWidget {
  
 class _SignupState extends State<Signup> {
   File _image;
-  String _email;
+  User userInfo=User();
   String _password;
-  String name;
-  String address;
-  String phno;
  
   Future getImage() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
@@ -50,8 +47,9 @@ class _SignupState extends State<Signup> {
                           decoration: BoxDecoration(
                               color: Colors.red,
                               image: DecorationImage(
-                                  image: _image != null
-                                      ? FileImage(_image)
+                                  image:
+                                  _image != null         
+                                     ? FileImage(_image)
                                       : AssetImage('img/image.png'),
                                   fit: BoxFit.cover),
                               borderRadius:
@@ -65,7 +63,7 @@ class _SignupState extends State<Signup> {
                     decoration: InputDecoration(hintText: 'FULL NAME'),
                     onChanged: (value) {
                       setState(() {
-                       name = value;
+                       userInfo.name = value;
                       });
                     }),
                 SizedBox(height: 15.0),
@@ -73,7 +71,7 @@ class _SignupState extends State<Signup> {
                     decoration: InputDecoration(hintText: 'EMAIL'),
                     onChanged: (value) {
                       setState(() {
-                        _email = value;
+                        userInfo.email= value;
                       });
                     }),
                 SizedBox(height: 15.0),
@@ -90,7 +88,7 @@ class _SignupState extends State<Signup> {
                     decoration: InputDecoration(hintText: 'ADDRESS'),
                     onChanged: (value) {
                       setState(() {
-                        address = value;
+                        userInfo.address = value;
                       });
                     }),   
                  SizedBox(height: 15.0),
@@ -98,7 +96,7 @@ class _SignupState extends State<Signup> {
                     decoration: InputDecoration(hintText: 'PHONE'),
                     onChanged: (value) {
                       setState(() {
-                        phno = value;
+                        userInfo.phone = value;
                       });
                     }),    
                 SizedBox(height: 15.0),
@@ -110,18 +108,15 @@ class _SignupState extends State<Signup> {
                   onPressed: () {
                     FirebaseAuth.instance
                         .createUserWithEmailAndPassword(
-                            email: _email, password: _password)
-                        .then((signedInUser) {
-                          User user=User()
-                            
-                          ..email=_email
-                          ..id=signedInUser.user.uid
-                          ..name=name
-                          ..address=address
-                          ..phone=phno;
+                            email: userInfo.email, password: _password)
+                        .then((signedInUser) async{
+                         
+                      userInfo.id =   signedInUser.user.uid;
                           
-                          print(user.email);
-                      UserManagement().storeNewUser(user, context);
+                      var imageUrl = await uploadFile(userInfo.id); 
+                      userInfo.imageUrl = imageUrl;
+
+                      UserManagement().storeNewUser(userInfo, context);
                         Navigator.pushReplacement(
                          context,
                          MaterialPageRoute(builder: (context)=> ToDo())
@@ -136,6 +131,16 @@ class _SignupState extends State<Signup> {
     ),
         ));
   }
+  Future<String> uploadFile(String uid) async{
+    StorageReference storageReference = FirebaseStorage.instance
+    .ref()
+    .child('ProfilePictures/$uid');
+    StorageUploadTask uploadTask = storageReference.putFile(_image);
+    await uploadTask.onComplete;
+    print("fileeeeeeeeeeee uploadedddddddddddd");
+    String imageUrl = await storageReference.getDownloadURL();
+    return imageUrl;
+  }
 }
 class User{
   String id;
@@ -143,6 +148,7 @@ class User{
   String name;
   String address;
   String phone;
+  String imageUrl;
 
-  User({this.id, this.email, this.name, this.address, this.phone});
+  User({this.id, this.email, this.name, this.address, this.phone, this.imageUrl});
 }

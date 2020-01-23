@@ -16,7 +16,7 @@ class ToDo extends StatefulWidget {
 
 class _ToDoState extends State<ToDo> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  Map<String, dynamic> userInfo;
+  Map<dynamic, dynamic> userInfo;
   FirebaseUser currentUser;
 
   final db = Firestore.instance;
@@ -25,7 +25,6 @@ class _ToDoState extends State<ToDo> {
   
   @override
   void initState() {
-    asyncInit();
     super.initState();
      FirebaseAuth.instance.currentUser().then((user) {
       currentUser = user;
@@ -39,6 +38,8 @@ class _ToDoState extends State<ToDo> {
         });
       });
      });
+     setState(() {});
+      asyncInit();
   }
              
 
@@ -76,6 +77,8 @@ class _ToDoState extends State<ToDo> {
 
   @override
   Widget build(BuildContext context) {
+    if(userInfo == null)
+    return Scaffold(body: Center(child: CircularProgressIndicator()));
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -83,18 +86,22 @@ class _ToDoState extends State<ToDo> {
         backgroundColor: Colors.purpleAccent,
         elevation: 0.0,
       ),
-      drawer: Drawer(
+      drawer:
+      userInfo==null?
+      SizedBox()
+      :
+       Drawer(
         child: ListView(
           children: <Widget>[
            UserAccountsDrawerHeader(
-             accountName: Text(
-               userInfo["name"],
+             accountName:Text(
+              userInfo["name"]
              ),
              accountEmail: Text(
-               userInfo["email"],
+              userInfo["email"],
              ),
              currentAccountPicture: CircleAvatar(
-              backgroundImage: AssetImage('img/image.png'),
+              backgroundImage:NetworkImage(userInfo["imageUrl"])
              ),
            ),
             ListTile(
@@ -158,7 +165,7 @@ class _ToDoState extends State<ToDo> {
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      body:list==null
+      body:list==null  
       ? Center(
         child: CircularProgressIndicator(),
       ):
@@ -167,7 +174,7 @@ class _ToDoState extends State<ToDo> {
                child: Text("NO UNCOMPLETE TODOS"),
              )
           : new RefreshIndicator(
-              child: buildBody(),
+              child:buildBody(),
               onRefresh: _handleRefresh,
             ),
     );

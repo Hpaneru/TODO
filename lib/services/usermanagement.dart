@@ -16,6 +16,7 @@ class UserManagement {
       'name':result.name,
       'address':result.address,
       'phone':result.phone,
+      'imageUrl':result.imageUrl
     }).then((value) {
       Navigator.of(context).pop();
       Navigator.of(context).pushReplacementNamed('/ToDO');

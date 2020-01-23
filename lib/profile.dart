@@ -1,12 +1,7 @@
-//import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:todo/editprofile.dart';
-
 import 'login.dart';
 
 class Profile extends StatefulWidget {
@@ -15,9 +10,9 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   Map<String, dynamic> userInfo;
   FirebaseUser currentUser;
-  File _image;
 
   @override
   void initState() {
@@ -35,23 +30,20 @@ class _ProfileState extends State<Profile> {
         .document(currentUser.uid)
         .get()
         .then((snapshot) {
-            setState(() {
-              userInfo=snapshot.data;
-            });
+      setState(() {
+        userInfo = snapshot.data;
+      });
     });
   }
-
-   Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-
-    setState(() {
-      _image = image;
-    });
+  void showSnackBar(String value) {
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+      content: new Text(value),
+    ));
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+       key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Profile'),
       ),
@@ -69,9 +61,9 @@ class _ProfileState extends State<Profile> {
                       decoration: BoxDecoration(
                           color: Colors.red,
                           image: DecorationImage(
-                              image: _image != null
-                                      ? FileImage(_image)
-                                    :AssetImage('img/image.png'),
+                              image: userInfo["imageUrl"] != null
+                                  ? NetworkImage(userInfo["imageUrl"])
+                                  : AssetImage('img/image.png'),
                               fit: BoxFit.cover),
                           borderRadius: BorderRadius.all(Radius.circular(75.0)),
                           boxShadow: [
@@ -193,9 +185,7 @@ class _ProfileState extends State<Profile> {
                             elevation: 7.0,
                             child: GestureDetector(
                               onTap: () {
-                                  FirebaseAuth.instance
-                                    .signOut()
-                                    .then((value) {
+                                FirebaseAuth.instance.signOut().then((value) {
                                   Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
