@@ -14,12 +14,13 @@ class _CompletedState extends State<Completed> {
   List<Todo> list;
 
   @override
-  void initState() {
-    db
+  void initState()  {
+   db
         .collection("info")
         .where("completed", isEqualTo: true)
         .getDocuments()
         .then((QuerySnapshot snapshot) {
+          print("Data aayo ");
       if (list == null) {
         list = [];
       }
@@ -32,6 +33,7 @@ class _CompletedState extends State<Completed> {
       setState(() {});
     });
     super.initState();
+    print("after initstate data fetch");
   }
 
   void showSnackBar(String value) {
@@ -42,6 +44,8 @@ class _CompletedState extends State<Completed> {
 
   @override
   Widget build(BuildContext context) {
+    print("building");
+    // all data might not be fetched here
     return Scaffold(
       key: _scaffoldnew,
       appBar: AppBar(

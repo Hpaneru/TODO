@@ -7,8 +7,6 @@ import 'package:todo/profile.dart';
 import './add_taskpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
-
 class ToDo extends StatefulWidget {
   @override
   _ToDoState createState() => _ToDoState();
@@ -49,7 +47,7 @@ class _ToDoState extends State<ToDo> {
     ));
   }
 
-  asyncInit() async {
+  Future<void> asyncInit() async {
     await db
         .collection("info")
         .where("completed", isEqualTo: false)
@@ -65,9 +63,6 @@ class _ToDoState extends State<ToDo> {
       setState(() {});
     });
   }
-        
-
-
   addToList(Todo todo) {
     setState(() {
       list.add(todo);
@@ -107,7 +102,7 @@ class _ToDoState extends State<ToDo> {
             ListTile(
               title: Text('HOME'),
               onTap: () {
-                _handleRefresh();
+                asyncInit();
                 Navigator.pop(context);
               },
                
@@ -165,17 +160,18 @@ class _ToDoState extends State<ToDo> {
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      body:list==null  
+      body:
+      list == null
       ? Center(
         child: CircularProgressIndicator(),
       ):
       list.length==0
              ? Center(
                child: Text("NO UNCOMPLETE TODOS"),
-             )
-          : new RefreshIndicator(
+             ) :
+          new RefreshIndicator(
               child:buildBody(),
-              onRefresh: _handleRefresh,
+              onRefresh: asyncInit,
             ),
     );
   }
@@ -253,11 +249,6 @@ class _ToDoState extends State<ToDo> {
     await db.collection("info").document(item.id).delete();
   }
 
-  Future<void> _handleRefresh() async {
-    Future.delayed(Duration(seconds: 1)).then((onValue) {
-      asyncInit();
-    });
-  }
 }
 
 class Todo {
