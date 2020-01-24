@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:todo/button.dart';
 import 'todo.dart';
@@ -12,9 +13,18 @@ class AddTaskPage extends StatefulWidget {
 
 class _AddTaskPageState extends State<AddTaskPage> {
   final db = Firestore.instance;
+  FirebaseUser currentUser;
 
   String task;
- 
+
+  @override
+  void initState(){
+    super.initState();
+    FirebaseAuth.instance.currentUser().then((user){
+      currentUser = user;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -50,9 +60,13 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 ),
                 Button(
                   onPressed: () async {
-                    String id = db.collection("info").document().documentID;
-                    await  db.collection("info").document(id).setData({"title": task,"id":id,"completed":false});    
-                    widget.addToList(Todo(title: task, complete: false, id:id));
+                    String id = db.collection("todo").document().documentID;
+                    await db
+                        .collection("todo")
+                        .document(id)
+                        .setData({"title": task, "id": id, "completed": false, "currentUser":currentUser.uid});
+                    widget
+                        .addToList(Todo(title: task, complete: false, id: id));
                     Navigator.pop(context);
                   },
                   buttontext: "Save",
@@ -63,5 +77,3 @@ class _AddTaskPageState extends State<AddTaskPage> {
         ));
   }
 }
-
-

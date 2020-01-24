@@ -4,6 +4,7 @@ import 'package:todo/completed.dart';
 import 'package:todo/edit.dart';
 import 'package:todo/login.dart';
 import 'package:todo/profile.dart';
+//import 'package:todo/signup.dart';
 import './add_taskpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -26,6 +27,7 @@ class _ToDoState extends State<ToDo> {
     super.initState();
      FirebaseAuth.instance.currentUser().then((user) {
       currentUser = user;
+      asyncInit();
       Firestore.instance
       .collection("users")
       .document(currentUser.uid)
@@ -37,7 +39,6 @@ class _ToDoState extends State<ToDo> {
       });
      });
      setState(() {});
-      asyncInit();
   }
              
 
@@ -47,9 +48,10 @@ class _ToDoState extends State<ToDo> {
     ));
   }
 
-  Future<void> asyncInit() async {
+  Future<void> asyncInit() async{
     await db
-        .collection("info")
+        .collection("todo")
+        .where("currentUser", isEqualTo: currentUser.uid)
         .where("completed", isEqualTo: false)
         .getDocuments()
         .then((querySnapshot) {
@@ -58,7 +60,8 @@ class _ToDoState extends State<ToDo> {
           .map((m) => Todo(
               id: m.data['id'],
               complete: m.data['completed'],
-              title: m.data['title']))
+              title: m.data['title'],
+              ))
           .toList();
       setState(() {});
     });
@@ -191,7 +194,7 @@ class _ToDoState extends State<ToDo> {
       list[index] = item;
     });
     await db
-        .collection('info')
+        .collection('todo')
         .document(item.id)
         .updateData({'title': item.title});
     showSnackBar("TASK EDITED");
@@ -229,9 +232,8 @@ class _ToDoState extends State<ToDo> {
 
   void setCompleteness(Todo item, bool status) {
     setState(() {
-      print(status);
       item.complete = status;
-      db.collection('info').document(item.id).updateData({'completed': status});
+      db.collection('todo').document(item.id).updateData({'completed': status});
       if (status == true) {
         setState(() {
           list.remove(item);
@@ -246,7 +248,7 @@ class _ToDoState extends State<ToDo> {
       list.remove(item);
       showSnackBar("TASK DELETED");
     });
-    await db.collection("info").document(item.id).delete();
+    await db.collection("todo").document(item.id).delete();
   }
 
 }
@@ -255,6 +257,7 @@ class Todo {
   String title;
   bool complete;
   String id;
+  String currentUser;
 
-  Todo({this.title, this.complete = false, this.id});
+  Todo({this.title, this.complete = false, this.id, this.currentUser});
 }

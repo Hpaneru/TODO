@@ -8,7 +8,6 @@ class UserManagement {
   FirebaseUser firebaseUser;
  
   storeNewUser(User result, context) async{
-   print("added");
    var ref=Firestore.instance.collection('users');
   await ref.document(result.id).setData({
       'email': result.email,

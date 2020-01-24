@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:todo/todo.dart';
@@ -12,15 +13,18 @@ class _CompletedState extends State<Completed> {
 
   final db = Firestore.instance;
   List<Todo> list;
+  FirebaseUser currentUser;
 
   @override
   void initState()  {
+    FirebaseAuth.instance.currentUser().then((user){
+      currentUser = user;
    db
-        .collection("info")
+        .collection("todo")
+       .where("currentUser", isEqualTo: currentUser.uid)
         .where("completed", isEqualTo: true)
         .getDocuments()
         .then((QuerySnapshot snapshot) {
-          print("Data aayo ");
       if (list == null) {
         list = [];
       }
@@ -32,8 +36,8 @@ class _CompletedState extends State<Completed> {
       });
       setState(() {});
     });
+    });    
     super.initState();
-    print("after initstate data fetch");
   }
 
   void showSnackBar(String value) {
@@ -44,8 +48,6 @@ class _CompletedState extends State<Completed> {
 
   @override
   Widget build(BuildContext context) {
-    print("building");
-    // all data might not be fetched here
     return Scaffold(
       key: _scaffoldnew,
       appBar: AppBar(
@@ -89,17 +91,17 @@ class _CompletedState extends State<Completed> {
       list.remove(item);
       showSnackBar("TASK DELETED");
     });
-    await db.collection("info").document(item.id).delete();
+    await db.collection("todo").document(item.id).delete();
   }
 
   void setCompleteness(Todo item, bool status) {
     setState(() {
       print(status);
       item.complete = status;
-      db.collection('info').document(item.id).updateData({'completed': status});
+      db.collection('todo').document(item.id).updateData({'completed': status});
       if (status == false) {
         db
-            .collection('info')
+            .collection('todo')
             .document(item.id)
             .updateData({'completed': status});
         setState(() {
