@@ -12,6 +12,9 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  var _formKey = GlobalKey<FormState>();
+
   File _image;
   User userInfo = User();
   String _password;
@@ -25,105 +28,161 @@ class _SignupState extends State<Signup> {
     });
   }
 
+   void showSnackBar(String value) {
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+      content: new Text(value),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+       key: _scaffoldKey,
       appBar: AppBar(
         title: Text("SIGNUP"),
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Container(
-            padding: EdgeInsets.all(25.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(height: 15.0),
-                GestureDetector(
-                  onTap: getImage,
-                  child: Container(
-                      width: 150.0,
-                      height: 150.0,
-                      decoration: BoxDecoration(
-                          color: Colors.red,
-                          image: DecorationImage(
-                              image: _image != null
-                                  ? FileImage(_image)
-                                  : AssetImage('img/image.png'),
-                              fit: BoxFit.cover),
-                          borderRadius: BorderRadius.all(Radius.circular(75.0)),
-                          boxShadow: [
-                            BoxShadow(blurRadius: 7.0, color: Colors.black)
-                          ])),
-                ),
-                SizedBox(height: 15.0),
-                TextField(
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Center(
+            child: Container(
+              padding: EdgeInsets.all(25.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(height: 15.0),
+                  GestureDetector(
+                    onTap: getImage,
+                    child: Container(
+                        width: 150.0,
+                        height: 150.0,
+                        decoration: BoxDecoration(
+                            color: Colors.red,
+                            image: DecorationImage(
+                                image: _image != null
+                                    ? FileImage(_image)
+                                    : AssetImage('img/image.png'),
+                                fit: BoxFit.cover),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(75.0)),
+                            boxShadow: [
+                              BoxShadow(blurRadius: 7.0, color: Colors.black)
+                            ])),
+                  ),
+                  SizedBox(height: 15.0),
+                  TextFormField(
                     decoration: InputDecoration(hintText: 'FULL NAME'),
                     onChanged: (value) {
                       setState(() {
                         userInfo.name = value;
                       });
-                    }),
-                SizedBox(height: 15.0),
-                TextField(
+                    },
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "PLEASE ENTER YOUR NAME";
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 15.0),
+                  TextFormField(
                     decoration: InputDecoration(hintText: 'EMAIL'),
                     onChanged: (value) {
                       setState(() {
                         userInfo.email = value;
                       });
-                    }),
-                SizedBox(height: 15.0),
-                TextField(
+                    },
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'PLEASE ENTER EMAIL';
+                      }
+                        return null;
+                    },
+                  ),
+                  SizedBox(height: 15.0),
+                  TextFormField(
                     decoration: InputDecoration(hintText: 'PASSWORD'),
                     obscureText: true,
                     onChanged: (value) {
                       setState(() {
                         _password = value;
                       });
-                    }),
-                SizedBox(height: 15.0),
-                TextField(
+                    },
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "PLEASE ENTER PASSWORD";
+                      } else {
+                        if (value.length < 6) 
+                        return "MUST BE MORE THAN 6";
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 15.0),
+                  TextFormField(
                     decoration: InputDecoration(hintText: 'ADDRESS'),
                     onChanged: (value) {
                       setState(() {
                         userInfo.address = value;
                       });
-                    }),
-                SizedBox(height: 15.0),
-                TextField(
+                    },
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "PLEASE ENTER ADDRESS";
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 15.0),
+                  TextFormField(
                     decoration: InputDecoration(hintText: 'PHONE'),
                     onChanged: (value) {
                       setState(() {
                         userInfo.phone = value;
                       });
-                    }),
-                SizedBox(height: 15.0),
-                FlatButton(
-                  child: loading==true? CircularProgressIndicator(): 
-                  Text('Sign Up'),
-                  textColor: Colors.blue,
-                  onPressed: () {
-                    setState(() {
-                      loading = true;
-                    });
-                    FirebaseAuth.instance
-                        .createUserWithEmailAndPassword(
-                            email: userInfo.email, password: _password)
-                        .then((signedInUser) async {
-                      userInfo.id = signedInUser.user.uid;
+                    },
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "PLEASE ENTER PHONE NO.";
+                      } else {
+                        if (value.length <10) 
+                        return "MUST BE EQUAL T0 10";
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 15.0),
+                  FlatButton(
+                    child: loading == true
+                        ? CircularProgressIndicator()
+                        : Text('Sign Up'),
+                    textColor: Colors.blue,
+                    onPressed: () {
+                      setState(() {
+                        if (_formKey.currentState.validate()) {
+                          loading = true;
+                        }
+                      });
+                      FirebaseAuth.instance
+                          .createUserWithEmailAndPassword(
+                              email: userInfo.email, password: _password)
+                          .then((signedInUser) async {
+                        userInfo.id = signedInUser.user.uid;
 
-                      var imageUrl = await uploadFile(userInfo.id);
-                      userInfo.imageUrl = imageUrl;
+                        var imageUrl = await uploadFile(userInfo.id);
+                        userInfo.imageUrl = imageUrl;
 
-                      UserManagement().storeNewUser(userInfo, context);
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => ToDo()));
-                    }).catchError((e) {
-                      print(e);
-                    });
-                  },
-                ),
-              ],
+                        UserManagement().storeNewUser(userInfo, context);
+                        Navigator.pushReplacement(context,
+                            MaterialPageRoute(builder: (context) => ToDo()));
+                      }).catchError((e) {
+                        print(e.message);
+                        showSnackBar(e.message);
+                      });
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -4,7 +4,6 @@ import 'package:todo/completed.dart';
 import 'package:todo/edit.dart';
 import 'package:todo/login.dart';
 import 'package:todo/profile.dart';
-//import 'package:todo/signup.dart';
 import './add_taskpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -17,7 +16,6 @@ class _ToDoState extends State<ToDo> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   Map<dynamic, dynamic> userInfo;
   FirebaseUser currentUser;
-
   final db = Firestore.instance;
   static Todo todo;
   List<Todo> list;

@@ -9,20 +9,34 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  var _formKey =  GlobalKey<FormState>(); 
+
   String _email;
   String _password;
   bool loading = false;
 
+  void showSnackBar(String value) {
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+      content: new Text(value),
+    ));
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-        body: Center(
+    return Scaffold(
+      key: _scaffoldKey,
+        body: Form(
+          key: _formKey,   
             child: SingleChildScrollView(
       child: Container(
         padding: EdgeInsets.all(25.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            SizedBox(height: 150.0),
             Text(
               "LOGIN",
               style: TextStyle(
@@ -31,15 +45,23 @@ class _LoginPageState extends State<LoginPage> {
                   fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 50.0),
-            TextField(
+            TextFormField(
                 decoration: InputDecoration(hintText: 'EMAIL'),
                 onChanged: (value) {
                   setState(() {
                     _email = value;
+
                   });
-                }),
+                },
+                validator:(value){
+                  if (value.isEmpty) {
+                    return "PLEASE ENTER EMAIL";
+                  }
+                  return null;
+                },
+                ),
             SizedBox(height: 30.0),
-            TextField(
+            TextFormField(
               decoration: InputDecoration(hintText: 'PASSWORD'),
               onChanged: (value) {
                 setState(() {
@@ -47,6 +69,12 @@ class _LoginPageState extends State<LoginPage> {
                 });
               },
               obscureText: true,
+                validator:(value){
+                  if (value.isEmpty) {
+                    return "PLEASE ENTER PASSWORD";
+                  }
+                  return null;
+                },
             ),
             SizedBox(height: 60.0),
             FlatButton(
@@ -55,7 +83,9 @@ class _LoginPageState extends State<LoginPage> {
               textColor: Colors.blue,
               onPressed: () {
                 setState(() {
-                  loading = true;
+                   if (_formKey.currentState.validate()) {
+                    loading = true;
+                }
                 });
                 FirebaseAuth.instance
                     .signInWithEmailAndPassword(
@@ -64,7 +94,8 @@ class _LoginPageState extends State<LoginPage> {
                   Navigator.pushReplacement(
                       context, MaterialPageRoute(builder: (context) => ToDo()));
                 }).catchError((e) {
-                  print(e);
+                  print(e.message);
+                showSnackBar(e.message);
                 });
               },
             ),
@@ -87,8 +118,8 @@ class _LoginPageState extends State<LoginPage> {
               ],
             )
           ],
-        ),
       ),
+      )
     )));
   }
 }
