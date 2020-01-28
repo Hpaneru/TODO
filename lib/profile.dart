@@ -59,11 +59,14 @@ class _ProfileState extends State<Profile> {
                       width: 150.0,
                       height: 150.0,
                       decoration: BoxDecoration(
-                          color: Colors.red,
+                          color: Colors.blue,
                           image: DecorationImage(
                               image: userInfo["imageUrl"] != null
                                   ? NetworkImage(userInfo["imageUrl"])
-                                  : AssetImage('img/image.png'),
+                                  : Icon(
+                                    Icons.camera_enhance,
+                                    size: 60.0,
+                                  ),
                               fit: BoxFit.cover),
                           borderRadius: BorderRadius.all(Radius.circular(75.0)),
                           boxShadow: [

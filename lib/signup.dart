@@ -28,7 +28,7 @@ class _SignupState extends State<Signup> {
     });
   }
 
-   void showSnackBar(String value) {
+  void showSnackBar(String value) {
     _scaffoldKey.currentState.showSnackBar(new SnackBar(
       content: new Text(value),
     ));
@@ -37,7 +37,7 @@ class _SignupState extends State<Signup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       key: _scaffoldKey,
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text("SIGNUP"),
       ),
@@ -57,11 +57,12 @@ class _SignupState extends State<Signup> {
                         width: 150.0,
                         height: 150.0,
                         decoration: BoxDecoration(
-                            color: Colors.red,
+                            color: Colors.blue,
                             image: DecorationImage(
                                 image: _image != null
                                     ? FileImage(_image)
-                                    : AssetImage('img/image.png'),
+                                    :Icon(Icons.camera_enhance,
+                                    size:60.0),
                                 fit: BoxFit.cover),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(75.0)),
@@ -96,7 +97,7 @@ class _SignupState extends State<Signup> {
                       if (value.isEmpty) {
                         return 'PLEASE ENTER EMAIL';
                       }
-                        return null;
+                      return null;
                     },
                   ),
                   SizedBox(height: 15.0),
@@ -112,8 +113,7 @@ class _SignupState extends State<Signup> {
                       if (value.isEmpty) {
                         return "PLEASE ENTER PASSWORD";
                       } else {
-                        if (value.length < 6) 
-                        return "MUST BE MORE THAN 6";
+                        if (value.length < 6) return "MUST BE MORE THAN 6";
                       }
                       return null;
                     },
@@ -145,8 +145,7 @@ class _SignupState extends State<Signup> {
                       if (value.isEmpty) {
                         return "PLEASE ENTER PHONE NO.";
                       } else {
-                        if (value.length <10) 
-                        return "MUST BE EQUAL T0 10";
+                        if (value.length < 10) return "MUST BE EQUAL T0 10";
                       }
                       return null;
                     },

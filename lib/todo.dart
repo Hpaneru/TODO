@@ -19,26 +19,25 @@ class _ToDoState extends State<ToDo> {
   final db = Firestore.instance;
   static Todo todo;
   List<Todo> list;
-  
+
   @override
   void initState() {
     super.initState();
-     FirebaseAuth.instance.currentUser().then((user) {
+    FirebaseAuth.instance.currentUser().then((user) {
       currentUser = user;
       asyncInit();
       Firestore.instance
-      .collection("users")
-      .document(currentUser.uid)
-      .get()
-      .then((snapshot){
-        setState((){
-          userInfo=snapshot.data;
+          .collection("users")
+          .document(currentUser.uid)
+          .get()
+          .then((snapshot) {
+        setState(() {
+          userInfo = snapshot.data;
         });
       });
-     });
-     setState(() {});
+    });
+    setState(() {});
   }
-             
 
   void showSnackBar(String value) {
     _scaffoldKey.currentState.showSnackBar(new SnackBar(
@@ -46,7 +45,7 @@ class _ToDoState extends State<ToDo> {
     ));
   }
 
-  Future<void> asyncInit() async{
+  Future<void> asyncInit() async {
     await db
         .collection("todo")
         .where("currentUser", isEqualTo: currentUser.uid)
@@ -56,14 +55,15 @@ class _ToDoState extends State<ToDo> {
       var data = querySnapshot.documents;
       list = data
           .map((m) => Todo(
-              id: m.data['id'],
-              complete: m.data['completed'],
-              title: m.data['title'],
+                id: m.data['id'],
+                complete: m.data['completed'],
+                title: m.data['title'],
               ))
           .toList();
       setState(() {});
     });
   }
+
   addToList(Todo todo) {
     setState(() {
       list.add(todo);
@@ -73,8 +73,8 @@ class _ToDoState extends State<ToDo> {
 
   @override
   Widget build(BuildContext context) {
-    if(userInfo == null)
-    return Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (userInfo == null)
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -82,69 +82,70 @@ class _ToDoState extends State<ToDo> {
         backgroundColor: Colors.purpleAccent,
         elevation: 0.0,
       ),
-      drawer:
-      userInfo==null?
-      SizedBox()
-      :
-       Drawer(
-        child: ListView(
-          children: <Widget>[
-           UserAccountsDrawerHeader(
-             accountName:Text(
-              userInfo["name"]
-             ),
-             accountEmail: Text(
-              userInfo["email"],
-             ),
-             currentAccountPicture: CircleAvatar(
-              backgroundImage:NetworkImage(userInfo["imageUrl"])
-             ),
-           ),
-            ListTile(
-              title: Text('HOME'),
-              onTap: () {
-                asyncInit();
-                Navigator.pop(context);
-              },
-               
+      drawer: userInfo == null
+          ? SizedBox()
+          : Drawer(
+              child: ListView(
+                children: <Widget>[
+                  UserAccountsDrawerHeader(
+                    accountName: Text(userInfo["name"]),
+                    accountEmail: Text(
+                      userInfo["email"],
+                    ),
+                    currentAccountPicture: CircleAvatar(
+                      backgroundImage:
+                          NetworkImage(userInfo["imageUrl"]) != null
+                              ? NetworkImage(userInfo["imageUrl"])
+                              : Icon(
+                                  Icons.camera_enhance,
+                                  size: 60.0,
+                                ),
+                    ),
+                  ),
+                  ListTile(
+                    title: Text('HOME'),
+                    onTap: () {
+                      asyncInit();
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ListTile(
+                    title: Text('COMPLETED TASK'),
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Completed()));
+                    },
+                  ),
+                  ListTile(
+                    title: Text('PROFILE'),
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Profile()));
+                    },
+                  ),
+                  ListTile(
+                    title: Text('ABOUT'),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ListTile(
+                    title: Text('LOG OUT'),
+                    onTap: () {
+                      FirebaseAuth.instance.signOut().then((value) {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginPage()));
+                      }).catchError((e) {
+                        print(e);
+                      });
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
             ),
-            ListTile(
-              title: Text('COMPLETED TASK'),
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Completed()));
-              },
-            ),
-             ListTile(
-              title: Text('PROFILE'),
-              onTap: () {
-               Navigator.push(context,
-                MaterialPageRoute(builder: (context) => Profile()));
-              },
-            ),
-            ListTile(
-              title: Text('ABOUT'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-             ListTile(
-              title: Text('LOG OUT'),
-              onTap: () {
-                 FirebaseAuth.instance.signOut().then((value) {
-                      Navigator.pushReplacement(
-                           context,
-                           MaterialPageRoute(builder: (context)=> LoginPage())
-                           );
-                    }).catchError((e) {
-                      print(e);
-                    });
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         backgroundColor: Colors.purpleAccent,
@@ -161,19 +162,18 @@ class _ToDoState extends State<ToDo> {
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      body:
-      list == null
-      ? Center(
-        child: CircularProgressIndicator(),
-      ):
-      list.length==0
-             ? Center(
-               child: Text("NO UNCOMPLETE TODOS"),
-             ) :
-          new RefreshIndicator(
-              child:buildBody(),
-              onRefresh: asyncInit,
-            ),
+      body: list == null
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : list.length == 0
+              ? Center(
+                  child: Text("NO UNCOMPLETE TODOS"),
+                )
+              : new RefreshIndicator(
+                  child: buildBody(),
+                  onRefresh: asyncInit,
+                ),
     );
   }
 
@@ -185,7 +185,6 @@ class _ToDoState extends State<ToDo> {
       },
     );
   }
-
 
   editItem(Todo item, index, id) async {
     setState(() {
@@ -248,7 +247,6 @@ class _ToDoState extends State<ToDo> {
     });
     await db.collection("todo").document(item.id).delete();
   }
-
 }
 
 class Todo {
