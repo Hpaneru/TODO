@@ -96,6 +96,9 @@ class _LoginPageState extends State<LoginPage> {
                 }).catchError((e) {
                   print(e.message);
                 showSnackBar(e.message);
+                setState(() {
+                  loading = false;
+                });
                 });
               },
             ),

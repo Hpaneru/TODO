@@ -71,37 +71,31 @@ class _EditProfileState extends State<EditProfile> {
                             GestureDetector(
                               onTap: getImage,
                               child: Container(
-                                  width: 150.0,
-                                  height: 150.0,
-                                  decoration: BoxDecoration(
-                                      color: Colors.blue,
-                                      image: DecorationImage(
-                                          image: userInfo["imageUrl"] != null
-                                              ? NetworkImage(
-                                                  userInfo["imageUrl"])
-                                              : Icon(
-                                                  Icons.camera_enhance,
-                                                  size: 60.0,
-                                                ),
-                                          fit: BoxFit.cover),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(75.0)),
-                                      boxShadow: [
-                                        BoxShadow(
-                                            blurRadius: 7.0,
-                                            color: Colors.black)
-                                      ]),
-                                  ),
+                                width: 150.0,
+                                height: 150.0,
+                                decoration: BoxDecoration(
+                                    color: Colors.blue,
+                                    image: DecorationImage(
+                                        image: _image == null
+                                            ? NetworkImage(userInfo["imageUrl"])
+                                            : FileImage(_image),
+                                        fit: BoxFit.cover),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(75.0)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          blurRadius: 7.0, color: Colors.black)
+                                    ]),
+                              ),
                             ),
                             SizedBox(height: 40.0),
                             TextFormField(
-                              initialValue:
-                               userInfo["name"],
+                              initialValue: userInfo["name"],
                               decoration:
                                   InputDecoration(hintText: 'FULL NAME'),
                               onChanged: (value) {
                                 setState(() {
-                                  name = value;
+                                  userInfo["name"] = value;
                                 });
                               },
                               validator: (value) {
@@ -113,12 +107,11 @@ class _EditProfileState extends State<EditProfile> {
                             ),
                             SizedBox(height: 15.0),
                             TextFormField(
-                               initialValue:
-                               userInfo["address"],
+                              initialValue: userInfo["address"],
                               decoration: InputDecoration(hintText: 'ADDRESS'),
                               onChanged: (value) {
                                 setState(() {
-                                  address = value;
+                                  userInfo["address"] = value;
                                 });
                               },
                               validator: (value) {
@@ -130,12 +123,11 @@ class _EditProfileState extends State<EditProfile> {
                             ),
                             SizedBox(height: 15.0),
                             TextFormField(
-                               initialValue:
-                               userInfo["phone"],
+                              initialValue: userInfo["phone"],
                               decoration: InputDecoration(hintText: 'PHONE'),
                               onChanged: (value) {
                                 setState(() {
-                                  phno = value;
+                                  userInfo["phone"] = value;
                                 });
                               },
                               validator: (value) {
@@ -155,12 +147,9 @@ class _EditProfileState extends State<EditProfile> {
                                   : Text('UPDATE'),
                               textColor: Colors.blue,
                               onPressed: () {
-                                setState(() {
-                                  if (_formKey.currentState.validate()) {
-                                    updateData();
-                                    loading = true;
-                                  }
-                                });
+                                if (_formKey.currentState.validate()) {
+                                  updateData();
+                                }
                               },
                             ),
                           ],
@@ -168,28 +157,33 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                 )));
   }
-
-  updateData() {
+  updateData() async {
+    setState(() {
+      loading = true;
+    });
     try {
+      if (_image != null) await updateFile();
       Firestore.instance
           .collection('users')
           .document(currentUser.uid)
-          .updateData({'name': name, 'address': address, 'phone': phno});
-      updateFile();
+          .updateData({
+        'name': userInfo["name"],
+        'address': userInfo["address"],
+        'phone': userInfo["phone"]
+      }).then((_){
+         Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => ToDo()));
+      });
     } catch (e) {
       print(e.toString());
     }
   }
 
-  Future<String> updateFile() async {
+  updateFile() async  {
     StorageReference storageReference = FirebaseStorage.instance
         .ref()
         .child('ProfilePictures/${currentUser.uid}');
     StorageUploadTask uploadTask = storageReference.putFile(_image);
     await uploadTask.onComplete;
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => ToDo()));
-    String imageUrl = await storageReference.getDownloadURL();
-    return imageUrl;
   }
 }

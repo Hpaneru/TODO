@@ -54,21 +54,20 @@ class _SignupState extends State<Signup> {
                   GestureDetector(
                     onTap: getImage,
                     child: Container(
-                        width: 150.0,
-                        height: 150.0,
-                        decoration: BoxDecoration(
-                            color: Colors.blue,
-                            image: DecorationImage(
-                                image: _image != null
-                                    ? FileImage(_image)
-                                    :Icon(Icons.camera_enhance,
-                                    size:60.0),
-                                fit: BoxFit.cover),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(75.0)),
-                            boxShadow: [
-                              BoxShadow(blurRadius: 7.0, color: Colors.black)
-                            ])),
+                      width: 150.0,
+                      height: 150.0,
+                      decoration: BoxDecoration(
+                          color: Colors.blue,
+                          image: DecorationImage(
+                              image: _image == null
+                                  ? AssetImage("img/camera.png")
+                                  : FileImage(_image),
+                              fit: BoxFit.cover),
+                          borderRadius: BorderRadius.all(Radius.circular(75.0)),
+                          boxShadow: [
+                            BoxShadow(blurRadius: 7.0, color: Colors.black)
+                          ]),
+                    ),
                   ),
                   SizedBox(height: 15.0),
                   TextFormField(
