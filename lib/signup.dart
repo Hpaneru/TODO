@@ -167,16 +167,16 @@ class _SignupState extends State<Signup> {
                           .then((signedInUser) async {
                         userInfo.id = signedInUser.user.uid;
 
-                        if (_image !=null){
-                        var imageUrl = await uploadFile(userInfo.id);
-                        userInfo.imageUrl = imageUrl;
+                        if (_image != null) {
+                          var imageUrl = await uploadFile(userInfo.id);
+                          userInfo.imageUrl = imageUrl;
                         }
-                        
+
                         UserManagement().storeNewUser(userInfo, context);
                         Navigator.pushReplacement(context,
                             MaterialPageRoute(builder: (context) => ToDo()));
                       }).catchError((e) {
-                         setState(() {
+                        setState(() {
                           loading = false;
                         });
                         print(e.message);

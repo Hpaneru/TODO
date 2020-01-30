@@ -35,15 +35,17 @@ class _ProfileState extends State<Profile> {
       });
     });
   }
+
   void showSnackBar(String value) {
     _scaffoldKey.currentState.showSnackBar(new SnackBar(
       content: new Text(value),
     ));
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       key: _scaffoldKey,
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Profile'),
       ),
@@ -63,7 +65,7 @@ class _ProfileState extends State<Profile> {
                           image: DecorationImage(
                               image: userInfo["imageUrl"] != null
                                   ? NetworkImage(userInfo["imageUrl"])
-                                  :AssetImage("img/camera.png"),
+                                  : AssetImage("img/camera.png"),
                               fit: BoxFit.cover),
                           borderRadius: BorderRadius.all(Radius.circular(75.0)),
                           boxShadow: [

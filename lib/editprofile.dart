@@ -4,7 +4,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-// import 'package:todo/profile.dart';
 import 'package:todo/todo.dart';
 
 class EditProfile extends StatefulWidget {
@@ -71,20 +70,16 @@ class _EditProfileState extends State<EditProfile> {
                             SizedBox(height: 15.0),
                             GestureDetector(
                               onTap: getImage,
-                              child: Container(
-                                width: 150.0,
-                                height: 150.0,
-                                decoration: BoxDecoration(
-                                    color: Colors.blue,
-                                    image: DecorationImage(
-                                        image: profilepic(),
-                                        fit: BoxFit.cover),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(75.0)),
-                                    boxShadow: [
-                                      BoxShadow(
-                                          blurRadius: 7.0, color: Colors.black)
-                                    ]),
+                              child: CircleAvatar(
+                                radius: 70,
+                                backgroundImage: _image == null
+                                    ? NetworkImage(userInfo["imageUrl"]??"") 
+                                    : FileImage(_image),
+                                child: userInfo["imageUrl"] == null
+                                    ? Icon(Icons.camera_enhance,
+                                      size: 70.0,
+                                    ) 
+                                    : SizedBox(),
                               ),
                             ),
                             SizedBox(height: 40.0),
@@ -156,6 +151,7 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                 )));
   }
+
   updateData() async {
     setState(() {
       loading = true;
@@ -169,16 +165,16 @@ class _EditProfileState extends State<EditProfile> {
         'name': userInfo["name"],
         'address': userInfo["address"],
         'phone': userInfo["phone"]
-      }).then((_){
-         Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => ToDo()));
+      }).then((_) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => ToDo()));
       });
     } catch (e) {
       print(e.toString());
     }
   }
 
-  updateFile() async  {
+  updateFile() async {
     StorageReference storageReference = FirebaseStorage.instance
         .ref()
         .child('ProfilePictures/${currentUser.uid}');
@@ -186,10 +182,10 @@ class _EditProfileState extends State<EditProfile> {
     await uploadTask.onComplete;
   }
 
-   profilepic(){
-    if (userInfo["imageUrl"] == null) 
-      return AssetImage("img/camera.png"); 
-    else
-      return NetworkImage(userInfo["imageUrl"]);
-  }
+  //  profilepic(){
+  //   if (userInfo["imageUrl"] == null)
+  //     return AssetImage("img/camera.png");
+  //   else
+  //     return NetworkImage(userInfo["imageUrl"]);
+  // }
 }
