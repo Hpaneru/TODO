@@ -63,10 +63,7 @@ class _ProfileState extends State<Profile> {
                           image: DecorationImage(
                               image: userInfo["imageUrl"] != null
                                   ? NetworkImage(userInfo["imageUrl"])
-                                  : Icon(
-                                    Icons.camera_enhance,
-                                    size: 60.0,
-                                  ),
+                                  :AssetImage("img/camera.png"),
                               fit: BoxFit.cover),
                           borderRadius: BorderRadius.all(Radius.circular(75.0)),
                           boxShadow: [

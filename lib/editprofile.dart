@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+// import 'package:todo/profile.dart';
 import 'package:todo/todo.dart';
 
 class EditProfile extends StatefulWidget {
@@ -76,9 +77,7 @@ class _EditProfileState extends State<EditProfile> {
                                 decoration: BoxDecoration(
                                     color: Colors.blue,
                                     image: DecorationImage(
-                                        image: _image == null
-                                            ? NetworkImage(userInfo["imageUrl"])
-                                            : FileImage(_image),
+                                        image: profilepic(),
                                         fit: BoxFit.cover),
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(75.0)),
@@ -185,5 +184,12 @@ class _EditProfileState extends State<EditProfile> {
         .child('ProfilePictures/${currentUser.uid}');
     StorageUploadTask uploadTask = storageReference.putFile(_image);
     await uploadTask.onComplete;
+  }
+
+   profilepic(){
+    if (userInfo["imageUrl"] == null) 
+      return AssetImage("img/camera.png"); 
+    else
+      return NetworkImage(userInfo["imageUrl"]);
   }
 }

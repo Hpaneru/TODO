@@ -94,12 +94,9 @@ class _ToDoState extends State<ToDo> {
                     ),
                     currentAccountPicture: CircleAvatar(
                       backgroundImage:
-                          NetworkImage(userInfo["imageUrl"]) != null
-                              ? NetworkImage(userInfo["imageUrl"])
-                              : Icon(
-                                  Icons.camera_enhance,
-                                  size: 60.0,
-                                ),
+                          (userInfo["imageUrl"]) == null
+                              ? AssetImage("img/camera.png")
+                              : NetworkImage(userInfo["imageUrl"]),
                     ),
                   ),
                   ListTile(
