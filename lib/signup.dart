@@ -111,8 +111,6 @@ class _SignupState extends State<Signup> {
                     validator: (value) {
                       if (value.isEmpty) {
                         return "PLEASE ENTER PASSWORD";
-                      } else {
-                        if (value.length < 6) return "MUST BE MORE THAN 6";
                       }
                       return null;
                     },

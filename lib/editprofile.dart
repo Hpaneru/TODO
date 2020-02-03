@@ -49,7 +49,6 @@ class _EditProfileState extends State<EditProfile> {
       _image = image;
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,12 +71,13 @@ class _EditProfileState extends State<EditProfile> {
                               onTap: getImage,
                               child: CircleAvatar(
                                 radius: 70,
-                                backgroundImage: _image == null
+                                backgroundImage:
+                                 _image == null
                                     ? NetworkImage(userInfo["imageUrl"]??"") 
                                     : FileImage(_image),
-                                child: userInfo["imageUrl"] == null
-                                    ? Icon(Icons.camera_enhance,
-                                      size: 70.0,
+                                child: userInfo["imageUrl"] == null && _image ==null
+                                    ? Icon(Icons.photo_camera,
+                                      size: 20.0,
                                     ) 
                                     : SizedBox(),
                               ),
@@ -157,14 +157,15 @@ class _EditProfileState extends State<EditProfile> {
       loading = true;
     });
     try {
-      if (_image != null) await updateFile();
+      if (_image != null) userInfo["imageUrl"] = await updateFile();
       Firestore.instance
           .collection('users')
           .document(currentUser.uid)
           .updateData({
         'name': userInfo["name"],
         'address': userInfo["address"],
-        'phone': userInfo["phone"]
+        'phone': userInfo["phone"],
+        'imageUrl': userInfo["imageUrl"]
       }).then((_) {
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => ToDo()));
@@ -174,18 +175,13 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
-  updateFile() async {
+  Future<String> updateFile() async {
     StorageReference storageReference = FirebaseStorage.instance
         .ref()
         .child('ProfilePictures/${currentUser.uid}');
     StorageUploadTask uploadTask = storageReference.putFile(_image);
     await uploadTask.onComplete;
+    String imageUrl = await storageReference.getDownloadURL();
+    return imageUrl;
   }
-
-  //  profilepic(){
-  //   if (userInfo["imageUrl"] == null)
-  //     return AssetImage("img/camera.png");
-  //   else
-  //     return NetworkImage(userInfo["imageUrl"]);
-  // }
 }

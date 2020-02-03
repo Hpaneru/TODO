@@ -147,70 +147,36 @@ class _ProfileState extends State<Profile> {
                   ),
                   SizedBox(height: 25.0),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(20.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Container(
-                            height: 30.0,
-                            width: 95.0,
-                            child: Material(
-                              borderRadius: BorderRadius.circular(20.0),
-                              shadowColor: Colors.greenAccent,
-                              color: Colors.green,
-                              elevation: 7.0,
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => EditProfile()));
-                                },
-                                child: Center(
-                                  child: Text(
-                                    'EDIT PROFILE',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontFamily: 'Montserrat'),
-                                  ),
-                                ),
-                              ),
-                            )),
-                        SizedBox(height: 25.0),
-                        Container(
-                          height: 30.0,
-                          width: 95.0,
-                          child: Material(
-                            borderRadius: BorderRadius.circular(20.0),
-                            shadowColor: Colors.redAccent,
-                            color: Colors.red,
-                            elevation: 7.0,
-                            child: GestureDetector(
-                              onTap: () {
-                                FirebaseAuth.instance.signOut().then((value) {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => LoginPage()));
-                                }).catchError((e) {
-                                  print(e);
-                                });
-                                Navigator.pop(context);
-                              },
-                              child: Center(
-                                child: Text(
-                                  'LOG OUT',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: 'Montserrat'),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                        RaisedButton(
+                            child: Text('Edit Profile'),
+                            textColor: Colors.blue,
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => EditProfile()));
+                            }),
+                        RaisedButton(
+                            child: Text('Log Out'),
+                            textColor: Colors.blue,
+                            onPressed: () {
+                              FirebaseAuth.instance.signOut().then((value) {
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => LoginPage()));
+                              }).catchError((e) {
+                                print(e);
+                              });
+                              Navigator.pop(context);
+                            })
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

@@ -22,5 +22,4 @@ class UserManagement {
       print(e);
     });
   }
-  
 }

@@ -73,9 +73,7 @@ class _ToDoState extends State<ToDo> {
 
   @override
   Widget build(BuildContext context) {
-    if (userInfo == null)
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
-    return Scaffold(
+       return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
         title: Text('TODO'),
